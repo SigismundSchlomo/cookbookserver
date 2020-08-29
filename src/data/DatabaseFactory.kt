@@ -16,7 +16,7 @@ object DatabaseFactory {
         Database.connect(hikariForLocalHosting())
 
         transaction {
-            SchemaUtils.create(RecipesTable)
+            SchemaUtils.create(Recipes)
         }
     }
 
