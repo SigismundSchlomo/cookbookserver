@@ -6,13 +6,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object DatabaseFactory {
-
-    //TODO: Create alternative datasource for deployment
-
-    //CURRENT VERSION ONLY FOR LOCALHOST!! REQUIRE CONNECTED PSQL DATABASE
 
     fun init() {
         Database.connect(hikariForLocalHosting())
@@ -23,7 +21,7 @@ object DatabaseFactory {
     }
 
 
-    private fun hikariForLocalHosting(): HikariDataSource {
+    private fun hikariForLocalHosting(): HikariDataSource { //ONLY FOR LOCALHOST!! REQUIRE CONNECTED PSQL DATABASE
 
         val config = HikariConfig().apply {
             driverClassName = System.getenv("JDBC_DRIVER")
@@ -37,7 +35,7 @@ object DatabaseFactory {
         return HikariDataSource(config)
     }
 
-    private fun hikariForHostingWithHeroku(): HikariDataSource {
+    private fun hikariForHostingWithHeroku(): HikariDataSource { //ONLY FOR HEROKU POSTGRES DATABASE
 
         val config = HikariConfig().apply {
             driverClassName = System.getenv("JDBC_DRIVER")
@@ -61,6 +59,9 @@ object DatabaseFactory {
         block: () -> T
     ): T =
         withContext(Dispatchers.IO) {
-            transaction { block() }
+            transaction {
+                addLogger(StdOutSqlLogger)
+                block()
+            }
         }
 }
