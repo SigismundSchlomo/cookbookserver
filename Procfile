@@ -1,1 +1,1 @@
-web: build/install/cookbookserver/bin/cookbookserver
+web: java -jar build/libs/cookbookserver-0.1.jar
