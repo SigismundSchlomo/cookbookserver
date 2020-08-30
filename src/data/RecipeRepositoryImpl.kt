@@ -5,16 +5,16 @@ import com.sigismund.data.models.Recipe
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 
-class RecipeRepositoryImpl() : RecipeRepository {
-    override suspend fun addRecipe(header: String, body: String): EntityID<Int> {
+class RecipeRepositoryImpl : RecipeRepository {
+    override suspend fun addRecipe(recipe: Recipe): EntityID<Int>? {
         var id: EntityID<Int>? = null
         dbQuery {
             id = Recipes.insertAndGetId {
-                it[Recipes.header] = header
-                it[Recipes.body] = body
+                it[header] = recipe.header
+                it[body] = recipe.body
             }
         }
-        return id!!
+        return id
     }
 
     override suspend fun deleteRecipe(id: Int) {
@@ -33,10 +33,10 @@ class RecipeRepositoryImpl() : RecipeRepository {
         }
     }
 
-    override suspend fun updateRecipe(id: Int, header: String, body: String) {
+    override suspend fun updateRecipe(recipe: Recipe, id: Int) {
         dbQuery { Recipes.update ({ Recipes.id eq id }) {
-            it[Recipes.header] = header
-            it[Recipes.body] = body
+            it[header] = recipe.header
+            it[body] = recipe.body
         } }
     }
 
