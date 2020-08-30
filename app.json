@@ -1,0 +1,6 @@
+{
+  "name": "Recipes API",
+  "description" : "Simple REST API",
+  "image": "heroku/java",
+  "addons": ["heroku-postgresql"]
+}
