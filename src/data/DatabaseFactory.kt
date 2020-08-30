@@ -13,7 +13,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object DatabaseFactory {
 
     fun init() {
-        Database.connect(hikariForLocalHosting())
+        Database.connect(hikariForHostingWithHeroku())
 
         transaction {
             SchemaUtils.create(Recipes)
@@ -38,11 +38,10 @@ object DatabaseFactory {
     private fun hikariForHostingWithHeroku(): HikariDataSource { //ONLY FOR HEROKU POSTGRES DATABASE
 
         val config = HikariConfig().apply {
-            driverClassName = System.getenv("JDBC_DRIVER")
+            driverClassName = "org.postgresql.Driver"
             val credentialsAndConnection = System.getenv("DATABASE_URL").split("@")
             val credentials = credentialsAndConnection[0].split("postgres://")[1].split(":")
             val connection = credentialsAndConnection[1]
-            driverClassName = System.getenv("JDBC_DRIVER")
             jdbcUrl = "jdbc:postgresql://$connection"
             username = credentials[0]
             password = credentials[1]
