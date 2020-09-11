@@ -21,9 +21,11 @@ class RecipeRepositoryImpl : RecipeRepository {
         dbQuery { Recipes.deleteWhere { Recipes.id eq id } }
     }
 
-    override suspend fun getRecipes(): List<Recipe> {
+    override suspend fun getRecipes(userId: Int): List<Recipe> {
         return dbQuery {
-            Recipes.selectAll().mapNotNull { rowToRecipe(it) }
+            Recipes.select {
+                Recipes.userId.eq(userId)
+            }.mapNotNull { rowToRecipe(it) }
         }
     }
 
