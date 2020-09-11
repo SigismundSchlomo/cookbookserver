@@ -1,3 +1,3 @@
-package com.sigismund.data.auth
+package com.sigismund.auth
 
 data class MySession(val userId: Int)

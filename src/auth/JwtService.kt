@@ -1,4 +1,4 @@
-package com.sigismund.data.auth
+package com.sigismund.auth
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier

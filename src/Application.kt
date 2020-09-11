@@ -3,10 +3,9 @@ package com.sigismund
 import com.sigismund.data.DatabaseFactory
 import com.sigismund.data.RecipeRepositoryImpl
 import com.sigismund.data.UserRepositoryImpl
-import com.sigismund.data.auth.JwtService
-import com.sigismund.data.auth.MySession
-import com.sigismund.data.auth.hash
-import com.sigismund.data.models.Recipe
+import com.sigismund.auth.Auth
+import com.sigismund.auth.JwtService
+import com.sigismund.auth.MySession
 import com.sigismund.routes.recipes
 import com.sigismund.routes.users
 import io.ktor.application.*
@@ -14,10 +13,7 @@ import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 import io.ktor.features.*
 import io.ktor.gson.*
-import io.ktor.http.*
 import io.ktor.locations.*
-import io.ktor.response.*
-import io.ktor.request.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
 import io.ktor.util.*
@@ -48,7 +44,7 @@ fun Application.module() {
     val recipeRepo = RecipeRepositoryImpl()
     val userRepo = UserRepositoryImpl()
     val jwtService = JwtService()
-    val hashFunction = { s: String -> hash(s) }
+    val hashFunction = { s: String -> Auth.hash(s) }
 
 
     install(Authentication) {

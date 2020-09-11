@@ -1,8 +1,8 @@
 package com.sigismund.routes
 
+import com.sigismund.auth.MySession
 import com.sigismund.data.RecipeRepository
 import com.sigismund.data.UserRepository
-import com.sigismund.data.auth.MySession
 import com.sigismund.data.models.Recipe
 import io.ktor.application.*
 import io.ktor.auth.*

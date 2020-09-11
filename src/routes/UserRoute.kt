@@ -1,8 +1,8 @@
 package com.sigismund.routes
 
+import com.sigismund.auth.JwtService
+import com.sigismund.auth.MySession
 import com.sigismund.data.UserRepository
-import com.sigismund.data.auth.JwtService
-import com.sigismund.data.auth.MySession
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
