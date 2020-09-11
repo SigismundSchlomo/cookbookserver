@@ -7,6 +7,8 @@ import com.sigismund.data.auth.JwtService
 import com.sigismund.data.auth.MySession
 import com.sigismund.data.auth.hash
 import com.sigismund.data.models.Recipe
+import com.sigismund.routes.recipes
+import com.sigismund.routes.users
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -64,62 +66,11 @@ fun Application.module() {
     }
 
     routing {
-        route("/recipes") {
 
-            post {//Add "/new" to make endpoint more clear
-                val recipe = call.receive<Recipe>()
-                try {
-                    val id = recipeRepo.addRecipe(recipe)
-                    id?.let {
-                        call.respond(HttpStatusCode.OK, "${it.value}")
-                    }
-                } catch (e: Throwable) {
-                    call.respond(HttpStatusCode.BadRequest, "Problems saving recipe")
-                }
-            }
+        users(userRepo, jwtService, hashFunction)
 
-            get {
-                val recipes = recipeRepo.getRecipes()
-                call.respond(HttpStatusCode.OK, recipes)
-            }
+        recipes(recipeRepo, userRepo)
 
-            get("{id}") {
-                val id = call.parameters["id"]
-                try {
-                    id?.toInt()?.let {
-                        val recipe = recipeRepo.findRecipe(it)
-                        call.respond(HttpStatusCode.OK, recipe)
-                    }
-                } catch (e: Throwable) {
-                    call.respond(HttpStatusCode.BadRequest, "Problems getting recipe")
-                }
-            }
-
-            delete("{id}") {  //Change to "/delete/{id}
-                val id = call.parameters["id"]
-                try {
-                    id?.toInt()?.let {
-                        recipeRepo.deleteRecipe(it)
-                    }
-                } catch (e: Throwable) {
-                    call.respond(HttpStatusCode.BadRequest, "Problems deleting recipe")
-                }
-            }
-
-            patch("{id}") {  //Change to "/update/{id}
-                val recipe = call.receive<Recipe>()
-                val id = call.parameters["id"]
-                try {
-                    id?.toInt()?.let {
-                        recipeRepo.updateRecipe(recipe, it)
-                        call.respond(HttpStatusCode.OK)
-                    }
-                } catch (e: Throwable) {
-                    call.respond(HttpStatusCode.BadRequest, "Problems updating recipe")
-                }
-            }
-
-        }
     }
 
 }
