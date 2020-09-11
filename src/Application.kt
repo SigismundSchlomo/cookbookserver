@@ -28,7 +28,7 @@ fun Application.module() {
     routing {
         route("/recipes") {
 
-            post {
+            post {//Add "/new" to make endpoint more clear
                 val recipe = call.receive<Recipe>()
                 try {
                     val id = repo.addRecipe(recipe)
@@ -57,7 +57,7 @@ fun Application.module() {
                 }
             }
 
-            delete("{id}") {
+            delete("{id}") {  //Change to "/delete/{id}
                 val id = call.parameters["id"]
                 try {
                     id?.toInt()?.let {
@@ -68,7 +68,7 @@ fun Application.module() {
                 }
             }
 
-            patch("{id}") {
+            patch("{id}") {  //Change to "/update/{id}
                 val recipe = call.receive<Recipe>()
                 val id = call.parameters["id"]
                 try {
