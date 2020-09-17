@@ -1,6 +1,6 @@
 package com.sigismund.data
 
-import com.sigismund.data.models.Recipe
+import com.sigismund.models.Recipe
 import org.jetbrains.exposed.dao.id.EntityID
 
 interface RecipeRepository {

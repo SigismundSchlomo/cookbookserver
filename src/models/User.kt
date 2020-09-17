@@ -1,4 +1,4 @@
-package com.sigismund.data.models
+package com.sigismund.models
 
 import io.ktor.auth.*
 import java.io.Serializable

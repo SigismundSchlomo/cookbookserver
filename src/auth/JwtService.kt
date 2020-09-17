@@ -3,7 +3,7 @@ package com.sigismund.auth
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import com.sigismund.data.models.User
+import com.sigismund.models.User
 import java.util.*
 
 

@@ -1,7 +1,7 @@
 package com.sigismund.data
 
 import com.sigismund.data.DatabaseFactory.dbQuery
-import com.sigismund.data.models.User
+import com.sigismund.models.User
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert

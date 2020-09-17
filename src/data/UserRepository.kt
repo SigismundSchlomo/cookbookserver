@@ -1,6 +1,6 @@
 package com.sigismund.data
 
-import com.sigismund.data.models.User
+import com.sigismund.models.User
 
 interface UserRepository {
 

@@ -3,6 +3,7 @@ package com.sigismund.routes
 import com.sigismund.auth.JwtService
 import com.sigismund.auth.MySession
 import com.sigismund.data.UserRepository
+
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
@@ -37,9 +38,17 @@ class UserDeleteRoute
 fun Route.users(db: UserRepository, jwtService: JwtService, hashFunction: (String) -> String) {
 
     post<UserLoginRoute> {
-        val signinParameters = call.receive<Parameters>()
-        val password = signinParameters["password"] ?: return@post call.respond(HttpStatusCode.Unauthorized, "Missing password")
-        val email = signinParameters["email"] ?: return@post call.respond(HttpStatusCode.Unauthorized, "Missing email")
+        val request = call.receive<AuthRequest>()
+
+        val password = request.password
+        if (password.isEmpty()){
+            return@post call.respond(HttpStatusCode.Unauthorized, "Missing password")
+        }
+
+        val email = request.email
+        if (email.isEmpty()) {
+            return@post call.respond(HttpStatusCode.Unauthorized, "Missing email")
+        }
 
         val hash = hashFunction(password)
 
@@ -58,6 +67,7 @@ fun Route.users(db: UserRepository, jwtService: JwtService, hashFunction: (Strin
             call.respond(HttpStatusCode.BadRequest, "Problems retrieving user")
         }
     }
+
 
     post<UserLogoutRoute> {
         val signinParameters = call.receive<Parameters>()
@@ -95,10 +105,21 @@ fun Route.users(db: UserRepository, jwtService: JwtService, hashFunction: (Strin
     }
 
     post<UserCreateRoute> {
-        val signupParameters = call.receive<Parameters>()
-        val password = signupParameters["password"] ?: return@post call.respond(HttpStatusCode.Unauthorized, "Missing Fields")
-        val displayName = signupParameters["displayName"] ?: return@post call.respond(HttpStatusCode.Unauthorized, "Missing Fields")
-        val email = signupParameters["email"] ?: return@post call.respond(HttpStatusCode.Unauthorized, "Missing Fields")
+        val request = call.receive<AuthRequest>()
+        val displayName = request.name
+        if (displayName.isEmpty()) {
+            return@post call.respond(HttpStatusCode.Unauthorized, "Missing Fields")
+        }
+
+        val password = request.password
+        if (password.isEmpty()){
+            return@post call.respond(HttpStatusCode.Unauthorized, "Missing password")
+        }
+
+        val email = request.email
+        if (email.isEmpty()) {
+            return@post call.respond(HttpStatusCode.Unauthorized, "Missing email")
+        }
 
         val hash = hashFunction(password)
 

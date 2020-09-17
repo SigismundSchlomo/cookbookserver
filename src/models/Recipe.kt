@@ -1,4 +1,4 @@
-package com.sigismund.data.models
+package com.sigismund.models
 
 data class Recipe(
     val id: Int = -1,
