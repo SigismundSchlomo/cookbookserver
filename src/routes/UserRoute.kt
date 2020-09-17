@@ -3,6 +3,8 @@ package com.sigismund.routes
 import com.sigismund.auth.JwtService
 import com.sigismund.auth.MySession
 import com.sigismund.data.UserRepository
+import com.sigismund.routes.routingmodels.AuthRequest
+import com.sigismund.routes.routingmodels.AuthResponse
 
 import io.ktor.application.*
 import io.ktor.http.*
@@ -57,7 +59,9 @@ fun Route.users(db: UserRepository, jwtService: JwtService, hashFunction: (Strin
             currentUser?.userId?.let {
                 if (currentUser.passwordHash == hash) {
                     call.sessions.set(MySession(it))
-                    call.respondText(jwtService.generateToken(currentUser))
+                    val token = jwtService.generateToken(currentUser)
+                    val response = AuthResponse(token, currentUser.userId, currentUser.displayName, currentUser.email)
+                    call.respond(HttpStatusCode.OK, response)
                 } else {
                     call.respond(HttpStatusCode.BadRequest, "Problems retrieving user")
                 }
@@ -69,26 +73,29 @@ fun Route.users(db: UserRepository, jwtService: JwtService, hashFunction: (Strin
     }
 
 
-    post<UserLogoutRoute> {
-        val signinParameters = call.receive<Parameters>()
-        val email = signinParameters["email"] ?: return@post call.respond(HttpStatusCode.Unauthorized, "Missing Fields")
-
-        try {
-            val currentUser = db.findUserByEmail(email)
-            currentUser?.userId?.let {
-                call.sessions.clear(call.sessions.findName(MySession::class))
-                call.respond(HttpStatusCode.OK)
-            }
-        } catch (e: Throwable) {
-            application.log.error("Failed to register user", e)
-            call.respond(HttpStatusCode.BadRequest, "Problems retrieving User")
-        }
-
-    }
+//    post<UserLogoutRoute> {
+//        val signinParameters = call.receive<Parameters>()
+//        val email = signinParameters["email"] ?: return@post call.respond(HttpStatusCode.Unauthorized, "Missing Fields")
+//
+//        try {
+//            val currentUser = db.findUserByEmail(email)
+//            currentUser?.userId?.let {
+//                call.sessions.clear(call.sessions.findName(MySession::class))
+//                call.respond(HttpStatusCode.OK)
+//            }
+//        } catch (e: Throwable) {
+//            application.log.error("Failed to register user", e)
+//            call.respond(HttpStatusCode.BadRequest, "Problems retrieving User")
+//        }
+//
+//    }
 
     delete<UserDeleteRoute> {
-        val signinParameters = call.receive<Parameters>()
-        val email = signinParameters["email"] ?: return@delete call.respond(HttpStatusCode.Unauthorized, "Missing Fields")
+        val request = call.receive<AuthRequest>()
+        val email = request.email
+        if (email.isEmpty()) {
+            return@delete call.respond(HttpStatusCode.Unauthorized, "Missing Fields")
+        }
 
         try {
             val currentUser = db.findUserByEmail(email)
@@ -127,7 +134,9 @@ fun Route.users(db: UserRepository, jwtService: JwtService, hashFunction: (Strin
             val newUser = db.addUser(email, displayName, hash)
             newUser?.userId?.let {
                 call.sessions.set(MySession(it))
-                call.respondText(jwtService.generateToken(newUser), status = HttpStatusCode.Created)
+                val token = jwtService.generateToken(newUser)
+                val response = AuthResponse(token, newUser.userId, displayName, email)
+                call.respond(HttpStatusCode.Created, response)
             }
         } catch (e: Throwable) {
             application.log.error("Failed to register user", e)
