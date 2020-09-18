@@ -4,7 +4,6 @@ import com.sigismund.data.DatabaseFactory
 import com.sigismund.data.RecipeRepositoryImpl
 import com.sigismund.data.UserRepositoryImpl
 import com.sigismund.auth.JwtService
-import com.sigismund.auth.MySession
 import com.sigismund.auth.hash
 import com.sigismund.routes.recipes
 import com.sigismund.routes.users
@@ -15,7 +14,6 @@ import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.locations.*
 import io.ktor.routing.*
-import io.ktor.sessions.*
 import io.ktor.util.*
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -31,12 +29,6 @@ fun Application.module() {
     install(ContentNegotiation){
         gson {
             setPrettyPrinting()
-        }
-    }
-
-    install(Sessions) {
-        cookie<MySession>("MY_SESSION") {
-            cookie.extensions["SameSite"] = "lax"
         }
     }
 
@@ -65,7 +57,7 @@ fun Application.module() {
 
         users(userRepo, jwtService, hashFunction)
 
-        recipes(recipeRepo, userRepo)
+        recipes(recipeRepo)
 
     }
 
