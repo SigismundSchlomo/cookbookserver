@@ -1,6 +1,5 @@
 package com.sigismund.routes
 
-import com.sigismund.auth.MySession
 import com.sigismund.data.RecipeRepository
 import com.sigismund.data.UserRepository
 import com.sigismund.models.Recipe
@@ -11,7 +10,6 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.sessions.*
 
 const val RECIPES = "/recipes"
 
@@ -20,20 +18,19 @@ const val RECIPES = "/recipes"
 class RecipeRoute
 
 @KtorExperimentalLocationsAPI
-fun Route.recipes(recipeRepo: RecipeRepository, userRepo: UserRepository) {
+fun Route.recipes(recipeRepo: RecipeRepository) {
     authenticate("jwt") {
 
         post<RecipeRoute> {
             val recipe = call.receive<Recipe>()
-
-            val user = call.sessions.get<MySession>()?.let { userRepo.findUser(it.userId) }
-            if (user == null) {
+            val userId = call.request.headers["userId"]?.toInt()
+            if (userId == null) {
                 call.respond(HttpStatusCode.BadRequest, "Problems retrieving user")
                 return@post
             }
 
             try {
-                recipe.userId = user.userId
+                recipe.userId = userId
                 val id = recipeRepo.addRecipe(recipe)
                 id?.let {
                     call.respond(HttpStatusCode.OK, "${it.value}")
@@ -45,14 +42,14 @@ fun Route.recipes(recipeRepo: RecipeRepository, userRepo: UserRepository) {
         }
 
         get<RecipeRoute> {
-            val user = call.sessions.get<MySession>()?.let { userRepo.findUser(it.userId) }
-            if (user == null) {
+            val userId = call.request.headers["userId"]?.toInt()
+            if (userId == null) {
                 call.respond(HttpStatusCode.BadRequest, "Problems retrieving User")
                 return@get
             }
 
             try {
-                val recipes = recipeRepo.getRecipes(user.userId)
+                val recipes = recipeRepo.getRecipes(userId)
                 call.respond(HttpStatusCode.OK, recipes)
             } catch (e: Throwable) {
                 application.log.error("Failed to get Recipes", e)
@@ -62,17 +59,14 @@ fun Route.recipes(recipeRepo: RecipeRepository, userRepo: UserRepository) {
         }
 
         delete<RecipeRoute> {
-            val parameters = call.receive<Parameters>()
-            if (!parameters.contains("id")) {
-                return@delete call.respond(HttpStatusCode.BadRequest, "Missing Todo Id")
-            }
+            val recipe = call.receive<Recipe>()
             try {
-                parameters["id"]?.toInt()?.let {
-                    val recipe = recipeRepo.findRecipe(it)
-                    call.respond(HttpStatusCode.OK, recipe)
+                recipe.id.let {
+                    recipeRepo.deleteRecipe(it)
+                    call.respond(HttpStatusCode.OK)
                 }
             } catch (e: Throwable) {
-                application.log.error("Failed to delete Recipes", e)
+                application.log.error("Failed to delete Recipe", e)
                 call.respond(HttpStatusCode.BadRequest, "Problems getting recipe")
             }
 
