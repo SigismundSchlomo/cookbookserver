@@ -1,6 +1,5 @@
 package com.sigismund.data
 
-import com.sigismund.data.CookingSteps.description
 import com.sigismund.data.DatabaseFactory.dbQuery
 import com.sigismund.models.CookingStep
 import com.sigismund.models.Ingredient
@@ -15,14 +14,17 @@ class RecipeRepositoryImpl : RecipeRepository {
             id = Recipes.insertAndGetId {
                 it[header] = recipe.header
                 it[body] = recipe.body
+                it[userId] = recipe.userId
             }
         }
         recipe.ingredients.forEach { ingredient ->
             dbQuery {
                 Ingredients.insert { ingredients ->
+                    ingredients[userId] = ingredient.userId
                     ingredients[recipeId] = ingredient.recipeId
                     ingredients[name] = ingredient.name
                     ingredients[quantity] = ingredient.quantity
+                    ingredients[isInTheList] = ingredient.isInTheList
                 }
             }
         }
@@ -96,9 +98,11 @@ class RecipeRepositoryImpl : RecipeRepository {
         recipe.ingredients.forEach { ingredient ->
             dbQuery {
                 Ingredients.insert { ingredients ->
+                    ingredients[userId] = ingredient.userId
                     ingredients[recipeId] = ingredient.recipeId
                     ingredients[name] = ingredient.name
                     ingredients[quantity] = ingredient.quantity
+                    ingredients[isInTheList] = ingredient.isInTheList
                 }
             }
         }
@@ -118,6 +122,7 @@ class RecipeRepositoryImpl : RecipeRepository {
         if (row == null) return null
         return Recipe(
             id = row[Recipes.id].value,
+            userId = row[Recipes.userId],
             header = row[Recipes.header],
             body = row[Recipes.body]
         )
@@ -126,9 +131,11 @@ class RecipeRepositoryImpl : RecipeRepository {
     private fun rowToIngredient(row: ResultRow?): Ingredient? {
         if (row == null) return null
         return Ingredient(
+            userId = row[Ingredients.userId],
             recipeId = row[Ingredients.recipeId],
             name = row[Ingredients.name],
-            quantity = row[Ingredients.quantity]
+            quantity = row[Ingredients.quantity],
+            isInTheList = row[Ingredients.isInTheList]
         )
     }
 
