@@ -1,0 +1,9 @@
+package com.sigismund.data
+
+import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.Column
+
+object CookingSteps : IntIdTable() {
+    val recipeId: Column<Int> = integer("recipeId").references(Recipes.id)
+    val description = varchar("description", 512)
+}
