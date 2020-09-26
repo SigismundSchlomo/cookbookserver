@@ -15,17 +15,12 @@ import io.ktor.sessions.*
 
 const val USERS = "/users"
 const val USER_LOGIN = "$USERS/login"
-const val USER_LOGOUT = "$USERS/logout"
 const val USER_CREATE = "$USERS/create"
 const val USER_DELETE = "$USERS/delete"
 
 @KtorExperimentalLocationsAPI
 @Location(USER_LOGIN)
 class UserLoginRoute
-
-@KtorExperimentalLocationsAPI
-@Location(USER_LOGOUT)
-class UserLogoutRoute
 
 @KtorExperimentalLocationsAPI
 @Location(USER_CREATE)
@@ -55,13 +50,17 @@ fun Route.users(db: UserRepository, jwtService: JwtService, hashFunction: (Strin
 
         try {
             val currentUser = db.findUserByEmail(email)
-            currentUser?.userId?.let {
-                if (currentUser.passwordHash == hash) {
-                    val token = jwtService.generateToken(currentUser)
-                    val response = AuthResponse(token, currentUser.userId, currentUser.displayName, currentUser.email)
-                    call.respond(HttpStatusCode.OK, response)
-                } else {
-                    call.respond(HttpStatusCode.BadRequest, "Problems retrieving user")
+            if (currentUser == null) {
+                call.respond(HttpStatusCode.BadRequest, "No such user")
+            } else {
+                currentUser.userId.let {
+                    if (currentUser.passwordHash == hash) {
+                        val token = jwtService.generateToken(currentUser)
+                        val response = AuthResponse(token, currentUser.userId, currentUser.displayName, currentUser.email)
+                        call.respond(HttpStatusCode.OK, response)
+                    } else {
+                        call.respond(HttpStatusCode.BadRequest, "Problems retrieving user")
+                    }
                 }
             }
         } catch (e: Throwable) {
