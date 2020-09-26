@@ -131,6 +131,7 @@ class RecipeRepositoryImpl : RecipeRepository {
     private fun rowToIngredient(row: ResultRow?): Ingredient? {
         if (row == null) return null
         return Ingredient(
+            id = row[Ingredients.id].value,
             userId = row[Ingredients.userId],
             recipeId = row[Ingredients.recipeId],
             name = row[Ingredients.name],
