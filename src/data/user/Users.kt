@@ -1,4 +1,4 @@
-package com.sigismund.data
+package com.sigismund.data.user
 
 import org.jetbrains.exposed.dao.id.IntIdTable
 

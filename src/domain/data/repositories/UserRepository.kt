@@ -1,4 +1,4 @@
-package com.sigismund.data
+package com.sigismund.domain.data.repositories
 
 import com.sigismund.models.User
 

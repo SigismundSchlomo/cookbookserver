@@ -1,9 +1,12 @@
 package com.sigismund.routes
 
 import com.sigismund.auth.JwtService
-import com.sigismund.data.UserRepository
-import com.sigismund.routes.routingmodels.AuthRequest
-import com.sigismund.routes.routingmodels.AuthResponse
+import com.sigismund.domain.data.repositories.UserRepository
+import com.sigismund.domain.services.NoSuchUserException
+import com.sigismund.domain.services.UserService
+import com.sigismund.domain.services.WrongPasswordException
+import com.sigismund.domain.services.routingmodels.AuthRequest
+import com.sigismund.domain.services.routingmodels.AuthResponse
 
 import io.ktor.application.*
 import io.ktor.http.*
@@ -11,7 +14,7 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.sessions.*
+import io.ktor.util.*
 
 const val USERS = "/users"
 const val USER_LOGIN = "$USERS/login"
@@ -31,7 +34,8 @@ class UserCreateRoute
 class UserDeleteRoute
 
 @KtorExperimentalLocationsAPI
-fun Route.users(db: UserRepository, jwtService: JwtService, hashFunction: (String) -> String) {
+@KtorExperimentalAPI
+fun Route.users(userService: UserService) {
 
     post<UserLoginRoute> {
         val request = call.receive<AuthRequest>()
@@ -46,44 +50,36 @@ fun Route.users(db: UserRepository, jwtService: JwtService, hashFunction: (Strin
             return@post call.respond(HttpStatusCode.Unauthorized, "Missing email")
         }
 
-        val hash = hashFunction(password)
-
         try {
-            val currentUser = db.findUserByEmail(email)
-            if (currentUser == null) {
-                call.respond(HttpStatusCode.BadRequest, "No such user")
-            } else {
-                currentUser.userId.let {
-                    if (currentUser.passwordHash == hash) {
-                        val token = jwtService.generateToken(currentUser)
-                        val response = AuthResponse(token, currentUser.userId, currentUser.displayName, currentUser.email)
-                        call.respond(HttpStatusCode.OK, response)
-                    } else {
-                        call.respond(HttpStatusCode.BadRequest, "Problems retrieving user")
-                    }
-                }
-            }
-        } catch (e: Throwable) {
-            application.log.error("Failed to register user", e)
+            val response = userService.loginUser(email, password)
+            call.respond(HttpStatusCode.OK, response)
+        } catch (e: NoSuchUserException) {
+            call.respond(HttpStatusCode.Unauthorized, e.message.toString())
+        } catch (e: WrongPasswordException) {
+            call.respond(HttpStatusCode.Unauthorized, e.message.toString())
+        } catch (t: Throwable) {
+            application.log.error("Failed to login user", t)
             call.respond(HttpStatusCode.BadRequest, "Problems retrieving user")
         }
     }
 
     delete<UserDeleteRoute> {
         val request = call.receive<AuthRequest>()
+
+        val password = request.password
+        if (password.isEmpty()){
+            return@delete call.respond(HttpStatusCode.Unauthorized, "Missing password")
+        }
+
         val email = request.email
         if (email.isEmpty()) {
             return@delete call.respond(HttpStatusCode.Unauthorized, "Missing Fields")
         }
 
         try {
-            val currentUser = db.findUserByEmail(email)
-            currentUser?.userId?.let {
-                db.deleteUser(it)
-                call.respond(HttpStatusCode.OK)
-            }
-        } catch (e: Throwable) {
-            application.log.error("Failed to register user", e)
+            userService.deleteUser(email, password)
+        } catch (t: Throwable) {
+            application.log.error("Failed to delete user", t)
             call.respond(HttpStatusCode.BadRequest, "Problems retrieving User")
         }
 
@@ -106,17 +102,10 @@ fun Route.users(db: UserRepository, jwtService: JwtService, hashFunction: (Strin
             return@post call.respond(HttpStatusCode.Unauthorized, "Missing email")
         }
 
-        val hash = hashFunction(password)
-
         try {
-            val newUser = db.addUser(email, displayName, hash)
-            newUser?.userId?.let {
-                val token = jwtService.generateToken(newUser)
-                val response = AuthResponse(token, newUser.userId, displayName, email)
-                call.respond(HttpStatusCode.Created, response)
-            }
-        } catch (e: Throwable) {
-            application.log.error("Failed to register user", e)
+            userService.createUser(email, password, displayName)
+        } catch (t: Throwable) {
+            application.log.error("Failed to register user", t)
             call.respond(HttpStatusCode.BadRequest, "Problems creating User")
         }
 

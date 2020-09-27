@@ -1,8 +1,6 @@
-package com.sigismund.data
+package com.sigismund.data.recipe
 
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
+import com.sigismund.data.user.Users
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 

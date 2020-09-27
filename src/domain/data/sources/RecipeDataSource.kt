@@ -1,9 +1,9 @@
-package com.sigismund.data
+package com.sigismund.domain.data.sources
 
 import com.sigismund.models.Recipe
 import org.jetbrains.exposed.dao.id.EntityID
 
-interface RecipeRepository {
+interface RecipeDataSource {
 
     suspend fun addRecipe(recipe: Recipe): EntityID<Int>?
     suspend fun deleteRecipe(id: Int)
