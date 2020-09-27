@@ -9,6 +9,7 @@ import com.sigismund.data.cookingstep.CookingStepsDataSourceImpl
 import com.sigismund.data.ingredient.IngredientDataSourceImpl
 import com.sigismund.data.recipe.RecipeDataSourceImpl
 import com.sigismund.data.user.UserDataSourceImpl
+import com.sigismund.domain.services.RecipeService
 import com.sigismund.domain.services.UserService
 import com.sigismund.routes.recipes
 import com.sigismund.routes.users
@@ -43,6 +44,7 @@ fun Application.module() {
     val ingredientDataSource = IngredientDataSourceImpl()
     val cookingStepDataSource = CookingStepsDataSourceImpl()
     val recipeRepo = RecipeRepositoryImpl(recipeDataSource, ingredientDataSource, cookingStepDataSource)
+    val recipeService = RecipeService(recipeRepo)
 
     val userDataSource = UserDataSourceImpl()
     val userRepo = UserRepositoryImpl(userDataSource)
@@ -68,7 +70,7 @@ fun Application.module() {
 
         users(userService)
 
-        recipes(recipeRepo)
+        recipes(recipeService)
 
     }
 
