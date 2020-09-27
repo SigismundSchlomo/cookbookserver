@@ -1,7 +1,7 @@
 package com.sigismund.routes
 
 import com.sigismund.auth.JwtService
-import com.sigismund.data.UserRepository
+import com.sigismund.domain.data.repositories.UserRepository
 import com.sigismund.routes.routingmodels.AuthRequest
 import com.sigismund.routes.routingmodels.AuthResponse
 
@@ -11,7 +11,6 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.sessions.*
 
 const val USERS = "/users"
 const val USER_LOGIN = "$USERS/login"
