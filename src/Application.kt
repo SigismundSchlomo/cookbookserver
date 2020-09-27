@@ -1,15 +1,8 @@
 package com.sigismund
 
-import com.sigismund.auth.Auth
 import com.sigismund.data.DatabaseFactory
-import com.sigismund.data.recipe.RecipeRepositoryImpl
-import com.sigismund.data.user.UserRepositoryImpl
 import com.sigismund.auth.JwtService
-import com.sigismund.data.cookingstep.CookingStepsDataSourceImpl
-import com.sigismund.data.ingredient.IngredientDataSourceImpl
-import com.sigismund.data.ingredient.IngredientRepositoryImpl
-import com.sigismund.data.recipe.RecipeDataSourceImpl
-import com.sigismund.data.user.UserDataSourceImpl
+import com.sigismund.domain.data.repositories.UserRepository
 import com.sigismund.domain.services.RecipeService
 import com.sigismund.domain.services.ShoppingService
 import com.sigismund.domain.services.UserService
@@ -24,6 +17,8 @@ import io.ktor.gson.*
 import io.ktor.locations.*
 import io.ktor.routing.*
 import io.ktor.util.*
+import org.koin.experimental.property.inject
+import org.koin.ktor.ext.inject
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -43,19 +38,12 @@ fun Application.module() {
 
     DatabaseFactory.init()
 
-    val recipeDataSource = RecipeDataSourceImpl()
-    val ingredientDataSource = IngredientDataSourceImpl()
-    val cookingStepDataSource = CookingStepsDataSourceImpl()
-    val recipeRepo = RecipeRepositoryImpl(recipeDataSource, ingredientDataSource, cookingStepDataSource)
-    val recipeService = RecipeService(recipeRepo)
 
-    val userDataSource = UserDataSourceImpl()
-    val userRepo = UserRepositoryImpl(userDataSource)
-    val jwtService = JwtService()
-    val userService = UserService(userRepo, jwtService, Auth())
-
-    val ingredientRepository = IngredientRepositoryImpl(ingredientDataSource)
-    val shoppingService = ShoppingService(ingredientRepository)
+    val jwtService: JwtService by inject()
+    val userRepo: UserRepository by inject()
+    val recipeService: RecipeService by inject()
+    val userService: UserService by inject()
+    val shoppingService : ShoppingService by inject()
 
     install(Authentication) {
         jwt("jwt") {
@@ -82,4 +70,5 @@ fun Application.module() {
     }
 
 }
+
 
