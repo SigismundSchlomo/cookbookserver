@@ -1,14 +1,16 @@
-package com.sigismund.data
+package com.sigismund.data.ingredient
 
-import com.sigismund.data.DatabaseFactory.dbQuery
+import com.sigismund.data.DatabaseFactory
+import com.sigismund.domain.data.sources.IngredientDataSource
 import com.sigismund.models.Ingredient
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
-class IngredientRepositoryImpl : IngredientsRepository {
+class IngredientDataSourceImpl : IngredientDataSource {
 
     override suspend fun getIngredientsInShoppingList(userId: Int): List<Ingredient> {
-        return dbQuery {
+        return DatabaseFactory.dbQuery {
             Ingredients.select {
                 Ingredients.userId.eq(userId)
             }.mapNotNull { row ->
@@ -19,7 +21,7 @@ class IngredientRepositoryImpl : IngredientsRepository {
 
     override suspend fun createIngredient(ingredient: Ingredient): EntityID<Int>? {
         var id: EntityID<Int>? = null
-        dbQuery {
+        DatabaseFactory.dbQuery {
             id = Ingredients.insertAndGetId { ingredients ->
                 ingredients[userId] = ingredient.userId
                 ingredients[recipeId] = ingredient.recipeId
@@ -32,27 +34,28 @@ class IngredientRepositoryImpl : IngredientsRepository {
     }
 
     override suspend fun deleteIngredient(ingredientId: Int) {
-        dbQuery { Ingredients.deleteWhere { Ingredients.id eq ingredientId } }
+        DatabaseFactory.dbQuery { Ingredients.deleteWhere { Ingredients.id eq ingredientId } }
     }
 
     override suspend fun chekAsInList(ingredientId: Int) {
-        dbQuery { Ingredients.update ({ Ingredients.id eq ingredientId }) { it[isInTheList] = true } }
+        DatabaseFactory.dbQuery { Ingredients.update({ Ingredients.id eq ingredientId }) { it[isInTheList] = true } }
     }
 
     override suspend fun uncheckAsInTheList(ingredientId: Int) {
-        dbQuery { Ingredients.update ({Ingredients.id eq ingredientId}) { it[isInTheList] = false } }
+        DatabaseFactory.dbQuery { Ingredients.update({ Ingredients.id eq ingredientId }) { it[isInTheList] = false } }
     }
 
     private fun rowToIngredient(row: ResultRow?): Ingredient? {
         if (row == null) return null
         if (!row[Ingredients.isInTheList]) return null
         return Ingredient(
-            id = row[Ingredients.id].value,
-            userId = row[Ingredients.userId],
-            recipeId = row[Ingredients.recipeId],
-            name = row[Ingredients.name],
-            quantity = row[Ingredients.quantity],
-            isInTheList = row[Ingredients.isInTheList]
+                id = row[Ingredients.id].value,
+                userId = row[Ingredients.userId],
+                recipeId = row[Ingredients.recipeId],
+                name = row[Ingredients.name],
+                quantity = row[Ingredients.quantity],
+                isInTheList = row[Ingredients.isInTheList]
         )
     }
+
 }

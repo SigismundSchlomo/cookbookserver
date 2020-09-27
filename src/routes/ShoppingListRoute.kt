@@ -1,7 +1,6 @@
 package com.sigismund.routes
 
-import com.sigismund.data.Ingredients
-import com.sigismund.data.IngredientsRepository
+import com.sigismund.domain.data.repositories.IngredientRepository
 import com.sigismund.models.Ingredient
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -38,7 +37,7 @@ class ShoppingCheck
 class ShoppingUncheck
 
 @KtorExperimentalLocationsAPI
-fun Route.shopping(db: IngredientsRepository) {
+fun Route.shopping(db: IngredientRepository) {
 
     authenticate("jwt") {
 
