@@ -1,10 +1,13 @@
 package com.sigismund
 
 import com.sigismund.data.DatabaseFactory
-import com.sigismund.data.RecipeRepositoryImpl
+import com.sigismund.data.recipe.RecipeRepositoryImpl
 import com.sigismund.data.user.UserRepositoryImpl
 import com.sigismund.auth.JwtService
 import com.sigismund.auth.hash
+import com.sigismund.data.cookingstep.CookingStepsDataSourceImpl
+import com.sigismund.data.ingredient.IngredientDataSourceImpl
+import com.sigismund.data.recipe.RecipeDataSourceImpl
 import com.sigismund.data.user.UserDataSourceImpl
 import com.sigismund.routes.recipes
 import com.sigismund.routes.users
@@ -34,9 +37,15 @@ fun Application.module() {
     }
 
     DatabaseFactory.init()
-    val recipeRepo = RecipeRepositoryImpl()
+
+    val recipeDataSource = RecipeDataSourceImpl()
+    val ingredientDataSource = IngredientDataSourceImpl()
+    val cookingStepDataSource = CookingStepsDataSourceImpl()
+    val recipeRepo = RecipeRepositoryImpl(recipeDataSource, ingredientDataSource, cookingStepDataSource)
+
     val userDataSource = UserDataSourceImpl()
     val userRepo = UserRepositoryImpl(userDataSource)
+
     val jwtService = JwtService()
     val hashFunction = { s: String -> hash(s) }
 

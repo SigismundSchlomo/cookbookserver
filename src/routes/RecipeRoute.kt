@@ -1,7 +1,6 @@
 package com.sigismund.routes
 
-import com.sigismund.data.RecipeRepository
-import com.sigismund.data.UserRepository
+import com.sigismund.domain.data.repositories.RecipeRepository
 import com.sigismund.models.Recipe
 import io.ktor.application.*
 import io.ktor.auth.*
