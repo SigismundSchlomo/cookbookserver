@@ -16,11 +16,16 @@ import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.locations.*
 import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import io.ktor.util.*
-import org.koin.experimental.property.inject
+import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
+import org.koin.logger.SLF4JLogger
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+fun main(args: Array<String>){
+    embeddedServer(Netty, commandLineEnvironment(args)).start()
+}
 
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
@@ -36,8 +41,12 @@ fun Application.module() {
         }
     }
 
-    DatabaseFactory.init()
+    install(Koin) {
+        SLF4JLogger()
+        modules(appModule)
+    }
 
+    DatabaseFactory.init()
 
     val jwtService: JwtService by inject()
     val userRepo: UserRepository by inject()
