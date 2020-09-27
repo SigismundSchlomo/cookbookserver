@@ -1,4 +1,4 @@
-package com.sigismund.routes.routingmodels
+package com.sigismund.domain.services.routingmodels
 
 data class AuthRequest(
         val email: String = "",

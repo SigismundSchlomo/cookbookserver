@@ -1,14 +1,15 @@
 package com.sigismund
 
+import com.sigismund.auth.Auth
 import com.sigismund.data.DatabaseFactory
 import com.sigismund.data.recipe.RecipeRepositoryImpl
 import com.sigismund.data.user.UserRepositoryImpl
 import com.sigismund.auth.JwtService
-import com.sigismund.auth.hash
 import com.sigismund.data.cookingstep.CookingStepsDataSourceImpl
 import com.sigismund.data.ingredient.IngredientDataSourceImpl
 import com.sigismund.data.recipe.RecipeDataSourceImpl
 import com.sigismund.data.user.UserDataSourceImpl
+import com.sigismund.domain.services.UserService
 import com.sigismund.routes.recipes
 import com.sigismund.routes.users
 import io.ktor.application.*
@@ -45,10 +46,9 @@ fun Application.module() {
 
     val userDataSource = UserDataSourceImpl()
     val userRepo = UserRepositoryImpl(userDataSource)
-
     val jwtService = JwtService()
-    val hashFunction = { s: String -> hash(s) }
 
+    val userService = UserService(userRepo, jwtService, Auth())
 
     install(Authentication) {
         jwt("jwt") {
@@ -66,7 +66,7 @@ fun Application.module() {
 
     routing {
 
-        users(userRepo, jwtService, hashFunction)
+        users(userService)
 
         recipes(recipeRepo)
 
