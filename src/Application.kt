@@ -1,11 +1,13 @@
 package com.sigismund
 
 import com.sigismund.data.DatabaseFactory
-import com.sigismund.data.RecipeRepositoryImpl
-import com.sigismund.data.UserRepositoryImpl
 import com.sigismund.auth.JwtService
-import com.sigismund.auth.hash
+import com.sigismund.domain.data.repositories.UserRepository
+import com.sigismund.domain.services.RecipeService
+import com.sigismund.domain.services.ShoppingService
+import com.sigismund.domain.services.UserService
 import com.sigismund.routes.recipes
+import com.sigismund.routes.shopping
 import com.sigismund.routes.users
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -15,6 +17,8 @@ import io.ktor.gson.*
 import io.ktor.locations.*
 import io.ktor.routing.*
 import io.ktor.util.*
+import org.koin.experimental.property.inject
+import org.koin.ktor.ext.inject
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -33,11 +37,13 @@ fun Application.module() {
     }
 
     DatabaseFactory.init()
-    val recipeRepo = RecipeRepositoryImpl()
-    val userRepo = UserRepositoryImpl()
-    val jwtService = JwtService()
-    val hashFunction = { s: String -> hash(s) }
 
+
+    val jwtService: JwtService by inject()
+    val userRepo: UserRepository by inject()
+    val recipeService: RecipeService by inject()
+    val userService: UserService by inject()
+    val shoppingService : ShoppingService by inject()
 
     install(Authentication) {
         jwt("jwt") {
@@ -55,11 +61,14 @@ fun Application.module() {
 
     routing {
 
-        users(userRepo, jwtService, hashFunction)
+        users(userService)
 
-        recipes(recipeRepo)
+        recipes(recipeService)
+
+        shopping(shoppingService)
 
     }
 
 }
+
 

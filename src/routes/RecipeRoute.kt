@@ -1,7 +1,7 @@
 package com.sigismund.routes
 
-import com.sigismund.data.RecipeRepository
-import com.sigismund.data.UserRepository
+import com.sigismund.domain.data.repositories.RecipeRepository
+import com.sigismund.domain.services.RecipeService
 import com.sigismund.models.Recipe
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -18,7 +18,7 @@ const val RECIPES = "/recipes"
 class RecipeRoute
 
 @KtorExperimentalLocationsAPI
-fun Route.recipes(recipeRepo: RecipeRepository) {
+fun Route.recipes(recipeService: RecipeService) {
     authenticate("jwt") {
 
         post<RecipeRoute> {
@@ -30,15 +30,13 @@ fun Route.recipes(recipeRepo: RecipeRepository) {
             }
 
             try {
-                recipe.userId = userId
-                val id = recipeRepo.addRecipe(recipe)
-                id?.let {
-                    call.respond(HttpStatusCode.OK, "${it.value}")
-                }
-            } catch (e: Throwable) {
-                application.log.error("Failed to add todo", e)
+                val id = recipeService.createRecipe(recipe)
+                call.respond(HttpStatusCode.OK, "$id")
+            } catch (t: Throwable) {
+                application.log.error("Failed to add todo", t)
                 call.respond(HttpStatusCode.BadRequest, "Problems saving recipe")
             }
+
         }
 
         get<RecipeRoute> {
@@ -49,7 +47,7 @@ fun Route.recipes(recipeRepo: RecipeRepository) {
             }
 
             try {
-                val recipes = recipeRepo.getRecipes(userId)
+                val recipes = recipeService.getRecipes(userId)
                 call.respond(HttpStatusCode.OK, recipes)
             } catch (e: Throwable) {
                 application.log.error("Failed to get Recipes", e)
@@ -62,7 +60,7 @@ fun Route.recipes(recipeRepo: RecipeRepository) {
             val recipe = call.receive<Recipe>()
             try {
                 recipe.id.let {
-                    recipeRepo.deleteRecipe(it)
+                    recipeService.deleteRecipe(it)
                     call.respond(HttpStatusCode.OK)
                 }
             } catch (e: Throwable) {

@@ -1,5 +1,6 @@
 package com.sigismund.data
 
+import com.sigismund.data.recipe.Recipes
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +55,7 @@ object DatabaseFactory {
         return HikariDataSource(config)
     }
 
+    //TODO: Add documentation to this function
     suspend fun <T> dbQuery(
         block: () -> T
     ): T =

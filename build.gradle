@@ -56,5 +56,8 @@ dependencies {
     implementation "org.postgresql:postgresql:$postgres_version"
     implementation "com.zaxxer:HikariCP:$hikaricp_version"
 
+    //Koin
+    implementation "org.koin:koin-ktor:$koin_version"
+
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
 }

@@ -1,4 +1,5 @@
-package com.sigismund.routes.routingmodels
+package com.sigismund.domain.services.routingmodels
+
 
 data class AuthResponse(
         val token: String,

@@ -1,5 +1,7 @@
-package com.sigismund.data
+package com.sigismund.data.ingredient
 
+import com.sigismund.data.recipe.Recipes
+import com.sigismund.data.user.Users
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 
