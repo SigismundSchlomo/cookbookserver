@@ -1,6 +1,7 @@
 package com.sigismund.routes
 
 import com.sigismund.domain.data.repositories.IngredientRepository
+import com.sigismund.domain.services.ShoppingService
 import com.sigismund.models.Ingredient
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -37,7 +38,7 @@ class ShoppingCheck
 class ShoppingUncheck
 
 @KtorExperimentalLocationsAPI
-fun Route.shopping(db: IngredientRepository) {
+fun Route.shopping(shoppingService: ShoppingService) {
 
     authenticate("jwt") {
 
@@ -49,7 +50,7 @@ fun Route.shopping(db: IngredientRepository) {
             }
 
             try {
-                val ingredients = db.getIngredientsInShoppingList(userId)
+                val ingredients = shoppingService.getShoppingList(userId)
                 call.respond(HttpStatusCode.OK, ingredients)
             } catch (t: Throwable) {
                 application.log.error("Failed to get ingredients", t)
@@ -67,10 +68,9 @@ fun Route.shopping(db: IngredientRepository) {
 
             try {
                 ingredient.userId = userId
-                val id = db.createIngredient(ingredient)
-                id?.let {
-                    call.respond(HttpStatusCode.OK)
-                }
+                val id = shoppingService.createIngredient(ingredient)
+                call.respond(HttpStatusCode.OK)
+
             } catch (t: Throwable) {
                 application.log.error("Failed to save ingredient", t)
                 call.respond(HttpStatusCode.BadRequest, "Failed to save ingredient to the list")
@@ -82,7 +82,7 @@ fun Route.shopping(db: IngredientRepository) {
             val ingredient = call.receive<Ingredient>()
             try {
                 ingredient.id.let {
-                    db.deleteIngredient(it)
+                    shoppingService.deleteIngredient(it)
                     call.respond(HttpStatusCode.OK)
                 }
             } catch (t: Throwable) {
@@ -95,7 +95,7 @@ fun Route.shopping(db: IngredientRepository) {
             val ingredient = call.receive<Ingredient>()
             try {
                 ingredient.id.let {
-                    db.chekAsInList(it)
+                    shoppingService.chekAsInList(it)
                     call.respond(HttpStatusCode.OK)
                 }
             } catch (t: Throwable) {
@@ -108,7 +108,7 @@ fun Route.shopping(db: IngredientRepository) {
             val ingredient = call.receive<Ingredient >()
             try {
                 ingredient.id.let {
-                    db.chekAsInList(it)
+                    shoppingService.chekAsInList(it)
                     call.respond(HttpStatusCode.OK)
                 }
             } catch (t: Throwable) {
