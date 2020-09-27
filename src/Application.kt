@@ -7,11 +7,14 @@ import com.sigismund.data.user.UserRepositoryImpl
 import com.sigismund.auth.JwtService
 import com.sigismund.data.cookingstep.CookingStepsDataSourceImpl
 import com.sigismund.data.ingredient.IngredientDataSourceImpl
+import com.sigismund.data.ingredient.IngredientRepositoryImpl
 import com.sigismund.data.recipe.RecipeDataSourceImpl
 import com.sigismund.data.user.UserDataSourceImpl
 import com.sigismund.domain.services.RecipeService
+import com.sigismund.domain.services.ShoppingService
 import com.sigismund.domain.services.UserService
 import com.sigismund.routes.recipes
+import com.sigismund.routes.shopping
 import com.sigismund.routes.users
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -49,8 +52,10 @@ fun Application.module() {
     val userDataSource = UserDataSourceImpl()
     val userRepo = UserRepositoryImpl(userDataSource)
     val jwtService = JwtService()
-
     val userService = UserService(userRepo, jwtService, Auth())
+
+    val ingredientRepository = IngredientRepositoryImpl(ingredientDataSource)
+    val shoppingService = ShoppingService(ingredientRepository)
 
     install(Authentication) {
         jwt("jwt") {
@@ -71,6 +76,8 @@ fun Application.module() {
         users(userService)
 
         recipes(recipeService)
+
+        shopping(shoppingService)
 
     }
 
