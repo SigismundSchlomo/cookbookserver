@@ -30,11 +30,15 @@ class RecipeRepositoryImpl(
         val recipes = recipeDataSource.getRecipes(userId)
 
         recipes.forEach {recipe ->
-            recipe.ingredients = ingredientDataSource.getIngredients(recipe.id)
+            if (!recipe.ingredients.isNullOrEmpty()) {
+                recipe.ingredients = ingredientDataSource.getIngredients(recipe.id)
+            }
         }
 
         recipes.forEach { recipe ->
-            recipe.cookingSteps = cookingStepDataSource.getCookingSteps(recipe.id)
+            if (!recipe.ingredients.isNullOrEmpty()){
+                recipe.cookingSteps = cookingStepDataSource.getCookingSteps(recipe.id)
+            }
         }
 
         return recipes
