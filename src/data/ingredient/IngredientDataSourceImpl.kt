@@ -23,7 +23,7 @@ class IngredientDataSourceImpl : IngredientDataSource {
     }
 
     override suspend fun insertIngredients(ingredients: List<Ingredient>) {
-        if (ingredients.isEmpty()) return
+        if (ingredients.isNullOrEmpty()) return
         ingredients.forEach { ingredient ->
             dbQuery {
                 Ingredients.insert { ingredients ->
