@@ -1,6 +1,5 @@
 package com.sigismund.routes
 
-import com.sigismund.domain.data.repositories.RecipeRepository
 import com.sigismund.domain.services.RecipeService
 import com.sigismund.models.Recipe
 import io.ktor.application.*
@@ -27,6 +26,8 @@ fun Route.recipes(recipeService: RecipeService) {
             if (userId == null) {
                 call.respond(HttpStatusCode.BadRequest, "Problems retrieving user")
                 return@post
+            } else {
+                recipe.userId = userId
             }
 
             try {
