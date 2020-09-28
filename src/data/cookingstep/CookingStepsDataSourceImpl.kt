@@ -22,6 +22,7 @@ class CookingStepsDataSourceImpl : CookingStepDataSource {
     }
 
     override suspend fun insertCookingSteps(cookingSteps: List<CookingStep>) {
+        if (cookingSteps.isEmpty()) return
         cookingSteps.forEach { cookingStep ->
             dbQuery {
                 CookingSteps.insert { cookingSteps ->

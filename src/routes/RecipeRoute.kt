@@ -34,7 +34,7 @@ fun Route.recipes(recipeService: RecipeService) {
                 val id = recipeService.createRecipe(recipe)
                 call.respond(HttpStatusCode.OK, "$id")
             } catch (t: Throwable) {
-                application.log.error("Failed to add todo", t)
+                application.log.error("Failed to add recipe", t)
                 call.respond(HttpStatusCode.BadRequest, "Problems saving recipe")
             }
 

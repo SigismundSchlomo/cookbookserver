@@ -1,6 +1,5 @@
 package com.sigismund.data.ingredient
 
-import com.sigismund.data.DatabaseFactory
 import com.sigismund.data.DatabaseFactory.dbQuery
 import com.sigismund.domain.data.sources.IngredientDataSource
 import com.sigismund.models.Ingredient
@@ -24,6 +23,7 @@ class IngredientDataSourceImpl : IngredientDataSource {
     }
 
     override suspend fun insertIngredients(ingredients: List<Ingredient>) {
+        if (ingredients.isEmpty()) return
         ingredients.forEach { ingredient ->
             dbQuery {
                 Ingredients.insert { ingredients ->
