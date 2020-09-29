@@ -8,12 +8,19 @@ import org.jetbrains.exposed.sql.*
 class CookingStepsDataSourceImpl : CookingStepDataSource {
 
     override suspend fun getCookingSteps(recipeId: Int): List<CookingStep> {
-        return dbQuery {
-            CookingSteps.select {
-                CookingSteps.recipeId.eq(recipeId)
-            }.mapNotNull { row ->
-                rowToCookingStep(row)
+        var result = listOf<CookingStep>()
+        try {
+            result = dbQuery {
+                CookingSteps.select {
+                    CookingSteps.recipeId.eq(recipeId)
+                }.mapNotNull { row ->
+                    rowToCookingStep(row)
+                }
             }
+        } catch (t: Throwable) {
+            //TODO: Add logging
+        } finally {
+            return result
         }
     }
 

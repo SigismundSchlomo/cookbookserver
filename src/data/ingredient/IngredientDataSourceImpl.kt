@@ -9,12 +9,19 @@ import org.jetbrains.exposed.sql.*
 class IngredientDataSourceImpl : IngredientDataSource {
 
     override suspend fun getIngredients(recipeId: Int): List<Ingredient> {
-        return dbQuery {
-            Ingredients.select {
-                Ingredients.recipeId eq recipeId
-            }.mapNotNull { row ->
-                rowToIngredient(row)
+        var result = listOf<Ingredient>()
+        try {
+            result = dbQuery {
+                Ingredients.select {
+                    Ingredients.recipeId eq recipeId
+                }.mapNotNull { row ->
+                    rowToIngredient(row)
+                }
             }
+        } catch (t: Throwable) {
+            //TODO: log throwable
+        } finally {
+            return result
         }
     }
 
@@ -52,12 +59,19 @@ class IngredientDataSourceImpl : IngredientDataSource {
     }
 
     override suspend fun getIngredientsInShoppingList(userId: Int): List<Ingredient> {
-        return dbQuery {
-            Ingredients.select {
-                Ingredients.userId.eq(userId)
-            }.mapNotNull { row ->
-                rowToIngredient(row)
+        var result = listOf<Ingredient>()
+        try {
+            result = dbQuery {
+                Ingredients.select {
+                    Ingredients.userId.eq(userId)
+                }.mapNotNull { row ->
+                    rowToIngredient(row)
+                }
             }
+        } catch (t: Throwable) {
+            //TODO: Add logging
+        } finally {
+            return result
         }
     }
 
