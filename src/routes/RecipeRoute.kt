@@ -60,10 +60,8 @@ fun Route.recipes(recipeService: RecipeService) {
         delete<RecipeRoute> {
             val recipe = call.receive<Recipe>()
             try {
-                recipe.id.let {
-                    recipeService.deleteRecipe(it)
-                    call.respond(HttpStatusCode.OK)
-                }
+                recipeService.deleteRecipe(recipe)
+                call.respond(HttpStatusCode.OK)
             } catch (e: Throwable) {
                 application.log.error("Failed to delete Recipe", e)
                 call.respond(HttpStatusCode.BadRequest, "Problems getting recipe")

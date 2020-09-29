@@ -13,8 +13,8 @@ class RecipeService(private val recipeRepository: RecipeRepository) {
         return recipeRepository.getRecipes(userId)
     }
 
-    suspend fun deleteRecipe(recipeId: Int) {
-        recipeRepository.deleteRecipe(recipeId)
+    suspend fun deleteRecipe(recipe: Recipe) {
+        recipeRepository.deleteRecipe(recipe)
     }
 
 }
