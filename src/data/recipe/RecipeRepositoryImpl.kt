@@ -20,10 +20,12 @@ class RecipeRepositoryImpl(
         return id
     }
 
-    override suspend fun deleteRecipe(id: Int) {
-        recipeDataSource.deleteRecipe(id)
-        ingredientDataSource.deleteIngredients(id)
-        cookingStepDataSource.deleteCookingSteps(id)
+    override suspend fun deleteRecipe(recipe: Recipe) {
+        recipeDataSource.deleteRecipe(recipe.id)
+
+        if (!recipe.ingredients.isNullOrEmpty()) ingredientDataSource.deleteIngredients(recipe.id)
+
+        if (!recipe.cookingSteps.isNullOrEmpty()) cookingStepDataSource.deleteCookingSteps(recipe.id)
     }
 
     override suspend fun getRecipes(userId: Int): List<Recipe> {
@@ -53,9 +55,9 @@ class RecipeRepositoryImpl(
     override suspend fun updateRecipe(recipe: Recipe, id: Int) {
         recipeDataSource.updateRecipe(recipe, id)
 
-        ingredientDataSource.updateIngredients(recipe.ingredients, id)
+        if (!recipe.ingredients.isNullOrEmpty()) ingredientDataSource.updateIngredients(recipe.ingredients, id)
 
-        cookingStepDataSource.updateCookingSteps(recipe.cookingSteps, id)
+        if (!recipe.cookingSteps.isNullOrEmpty()) cookingStepDataSource.updateCookingSteps(recipe.cookingSteps, id)
     }
 
 }

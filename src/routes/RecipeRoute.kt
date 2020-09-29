@@ -71,5 +71,7 @@ fun Route.recipes(recipeService: RecipeService) {
 
         }
 
+        //TODO: add update endpoint
+
     }
 }
