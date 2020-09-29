@@ -38,6 +38,7 @@ class IngredientDataSourceImpl : IngredientDataSource {
     }
 
     override suspend fun updateIngredients(ingredients: List<Ingredient>, recipeId: Int) {
+        if (ingredients.isNullOrEmpty()) return
         ingredients.forEach {ingredient ->
             dbQuery {
                 Ingredients.update ({Ingredients.recipeId eq recipeId}) {ingredients ->

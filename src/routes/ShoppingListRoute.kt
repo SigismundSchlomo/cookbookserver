@@ -1,6 +1,5 @@
 package com.sigismund.routes
 
-import com.sigismund.domain.data.repositories.IngredientRepository
 import com.sigismund.domain.services.ShoppingService
 import com.sigismund.models.Ingredient
 import io.ktor.application.*
@@ -69,7 +68,7 @@ fun Route.shopping(shoppingService: ShoppingService) {
             try {
                 ingredient.userId = userId
                 val id = shoppingService.createIngredient(ingredient)
-                call.respond(HttpStatusCode.OK)
+                call.respond(HttpStatusCode.OK, id)
 
             } catch (t: Throwable) {
                 application.log.error("Failed to save ingredient", t)
@@ -108,7 +107,7 @@ fun Route.shopping(shoppingService: ShoppingService) {
             val ingredient = call.receive<Ingredient >()
             try {
                 ingredient.id.let {
-                    shoppingService.chekAsInList(it)
+                    shoppingService.uncheckAsInTheList(it)
                     call.respond(HttpStatusCode.OK)
                 }
             } catch (t: Throwable) {

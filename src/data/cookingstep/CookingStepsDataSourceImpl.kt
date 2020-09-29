@@ -34,6 +34,7 @@ class CookingStepsDataSourceImpl : CookingStepDataSource {
     }
 
     override suspend fun updateCookingSteps(cookingSteps: List<CookingStep>, recipeId: Int) {
+        if (cookingSteps.isNullOrEmpty()) return
         cookingSteps.forEach { cookingStep ->
             dbQuery { CookingSteps.update ({ CookingSteps.recipeId eq recipeId }) {
                 it[description] = cookingStep.description
